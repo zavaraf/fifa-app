@@ -7,6 +7,7 @@ import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HealingIcon from "@mui/icons-material/Healing";
 import WarningIcon from "@mui/icons-material/Warning";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import BlockIcon from "@mui/icons-material/Block"; // Agrega este import para el icono de autogol
 import useJugadores from "../hooks/useJugadores";
 import useMatchDetails from "../hooks/useMatchDetails";
 import { AuthContext } from "../context/AuthContext";
@@ -102,11 +103,20 @@ useEffect(() => {
 
   const handleAddPlayer = (team, isAutogol = 0) => {
     if (!canSave || !selectedJugador) return; // Verificar si se puede editar
-    
+
+    // Determinar si es autogol según el equipo seleccionado y el equipo del jugador
+    let autogol = isAutogol;
+    if (team === "local" && selectedJugador.equipo?.id === jornada?.idEquipoVisita) {
+      autogol = 1;
+    }
+    if (team === "visit" && selectedJugador.equipo?.id === jornada?.idEquipoLocal) {
+      autogol = 1;
+    }
+
     const gol = {
       idEquipo: team === "local" ? jornada?.idEquipoLocal : jornada?.idEquipoVisita,
       idPersona: selectedJugador.id,
-      isAutogol,
+      isAutogol: autogol,
       nombreCompleto: selectedJugador.nombreCompleto,
       sobrenombre: selectedJugador.sobrenombre || "",
       deleted: 0,
@@ -137,27 +147,32 @@ useEffect(() => {
   const handleDeleteGol = (index) => {
     updateMatchDetails((prev) => {
       if (!prev || !prev.golesJornada) return prev;
-  
+
       const updatedMatchDetails = { ...prev };
-      const gol = updatedMatchDetails.golesJornada[index];
-  
-      // Restar el gol del marcador correspondiente
-      if (gol.idEquipo === jornada?.idEquipoLocal) {
-        updatedMatchDetails.golesLocal = Math.max((updatedMatchDetails.golesLocal || 0) - 1, 0);
-      } else if (gol.idEquipo === jornada?.idEquipoVisita) {
-        updatedMatchDetails.golesVisita = Math.max((updatedMatchDetails.golesVisita || 0) - 1, 0);
+      // Borrado lógico: marca el gol como deleted = 1
+      updatedMatchDetails.golesJornada = updatedMatchDetails.golesJornada.map((g, i) =>
+        i === index ? { ...g, deleted: 1 } : g
+      );
+
+      // Restar el gol del marcador correspondiente SOLO si el gol estaba activo antes de borrar
+      const gol = prev.golesJornada[index];
+      if (gol && !gol.deleted) {
+        if (gol.idEquipo === jornada?.idEquipoLocal) {
+          updatedMatchDetails.golesLocal = Math.max((updatedMatchDetails.golesLocal || 0) - 1, 0);
+        } else if (gol.idEquipo === jornada?.idEquipoVisita) {
+          updatedMatchDetails.golesVisita = Math.max((updatedMatchDetails.golesVisita || 0) - 1, 0);
+        }
       }
-  
-      // Eliminar el gol del arreglo golesJornada
-      updatedMatchDetails.golesJornada = updatedMatchDetails.golesJornada.filter((_, i) => i !== index);
-  
+
       return updatedMatchDetails;
     });
-  
-    // Actualiza golesJornada para mantener consistencia
-    setGolesJornada((prev) => prev.filter((_, i) => i !== index));
-  
-    console.log(`Gol eliminado en índice ${index}`);
+
+    // Borrado lógico también en el estado local
+    setGolesJornada((prev) =>
+      prev.map((g, i) => (i === index ? { ...g, deleted: 1 } : g))
+    );
+
+    console.log(`Gol marcado como eliminado (borrado lógico) en índice ${index}`);
   };
 
   const handleEditGol = (index, updatedGol) => {
@@ -228,17 +243,28 @@ useEffect(() => {
     console.log("Tarjeta agregada:", tarjeta);
   };
   
-  const handleDeleteDetalle = (index, tipo) => {
-    if (!canSave) return; // Verificar si se puede editar
-    
+  // Cambia la función handleDeleteDetalle para que elimine el gol correcto según el equipo y el índice visualizado:
+  const handleDeleteDetalle = (index, tipo, equipoId) => {
+    if (!canSave) return;
+
     if (tipo === "gol") {
-      handleDeleteGol(index);
+      // Encuentra el índice real del gol en golesJornada para ese equipo
+      const goles = [...matchDetails?.golesJornada || []].filter(g => g.idEquipo === equipoId && !g.deleted);
+      const globalIndex = matchDetails?.golesJornada?.findIndex((g, idx) =>
+        g.idEquipo === equipoId && !g.deleted &&
+        goles.indexOf(g) === index
+      );
+      if (globalIndex !== -1 && globalIndex !== undefined) {
+        handleDeleteGol(globalIndex);
+      }
     } else if (tipo === "lesion") {
-      setLesionesJornada((prev) => prev.filter((_, i) => i !== index));
-      console.log(`Lesión eliminada en índice ${index}`);
+      setLesionesJornada((prev) => prev.filter((detalle, i) =>
+        !(detalle.idEquipo === equipoId && i === index)
+      ));
     } else if (tipo === "tarjeta") {
-      setTarjetasJornada((prev) => prev.filter((_, i) => i !== index));
-      console.log(`Tarjeta eliminada en índice ${index}`);
+      setTarjetasJornada((prev) => prev.filter((detalle, i) =>
+        !(detalle.idEquipo === equipoId && i === index)
+      ));
     }
   };
 
@@ -589,9 +615,17 @@ useEffect(() => {
                     let tooltip = "";
 
                     if (detalle.isAutogol !== undefined) {
-                      icon = <Tooltip title="Gol"><SportsSoccerIcon color="primary" fontSize="small" /></Tooltip>;
+                      icon = (
+                        <>
+                          <Tooltip title={detalle.isAutogol ? "Autogol" : "Gol"}>
+                            {detalle.isAutogol
+                              ? <BlockIcon color="error" fontSize="small" sx={{ verticalAlign: "middle" }} />
+                              : <SportsSoccerIcon color="primary" fontSize="small" />}
+                          </Tooltip>
+                        </>
+                      );
                       tipo = "gol";
-                      tooltip = "Gol";
+                      tooltip = detalle.isAutogol ? "Autogol" : "Gol";
                     } else if (detalle.tipo !== undefined) {
                       if (detalle.tipo === 1) {
                         icon = <Tooltip title="Tarjeta Amarilla"><WarningIcon color="warning" fontSize="small" /></Tooltip>;
@@ -611,9 +645,14 @@ useEffect(() => {
                       <Box key={index} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                         <Typography sx={{ fontSize: 14, display: "flex", alignItems: "center", gap: 1 }}>
                           {icon} {detalle.nombreCompleto}
+                          {detalle.isAutogol ? (
+                            <span style={{ color: "#e53935", fontWeight: 700, marginLeft: 4, fontSize: 13 }}>
+                              (Autogol)
+                            </span>
+                          ) : null}
                         </Typography>
                         <IconButton 
-                          onClick={() => handleDeleteDetalle(index, tipo)} 
+                          onClick={() => handleDeleteDetalle(index, tipo, jornada?.idEquipoLocal)} 
                           color="error" 
                           size="small"
                           disabled={!canSave}
@@ -646,9 +685,17 @@ useEffect(() => {
                     let tooltip = "";
 
                     if (detalle.isAutogol !== undefined) {
-                      icon = <Tooltip title="Gol"><SportsSoccerIcon color="primary" fontSize="small" /></Tooltip>;
+                      icon = (
+                        <>
+                          <Tooltip title={detalle.isAutogol ? "Autogol" : "Gol"}>
+                            {detalle.isAutogol
+                              ? <BlockIcon color="error" fontSize="small" sx={{ verticalAlign: "middle" }} />
+                              : <SportsSoccerIcon color="primary" fontSize="small" />}
+                          </Tooltip>
+                        </>
+                      );
                       tipo = "gol";
-                      tooltip = "Gol";
+                      tooltip = detalle.isAutogol ? "Autogol" : "Gol";
                     } else if (detalle.tipo !== undefined) {
                       if (detalle.tipo === 1) {
                         icon = <Tooltip title="Tarjeta Amarilla"><WarningIcon color="warning" fontSize="small" /></Tooltip>;
@@ -668,9 +715,14 @@ useEffect(() => {
                       <Box key={index} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                         <Typography sx={{ fontSize: 14, display: "flex", alignItems: "center", gap: 1 }}>
                           {icon} {detalle.nombreCompleto}
+                          {detalle.isAutogol ? (
+                            <span style={{ color: "#e53935", fontWeight: 700, marginLeft: 4, fontSize: 13 }}>
+                              (Autogol)
+                            </span>
+                          ) : null}
                         </Typography>
                         <IconButton 
-                          onClick={() => handleDeleteDetalle(index, tipo)} 
+                          onClick={() => handleDeleteDetalle(index, tipo, jornada?.idEquipoVisita)} 
                           color="error" 
                           size="small"
                           disabled={!canSave}

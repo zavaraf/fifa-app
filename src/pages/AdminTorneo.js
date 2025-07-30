@@ -33,6 +33,7 @@ import useTorneos from "../hooks/useTorneos";
 import useSesion from "../hooks/useSesion";
 import CrearTorneoDrawer from "../components/CrearTorneoDrawer";
 import CrearJornadasFinalesDrawer from "../components/CrearJornadasFinalesDrawer";
+import CrearWoDrawer from "../components/CrearWoDrawer"; // nuevo import
 
 export default function AdminTorneo() {
   const { user, setUser } = useContext(AuthContext);
@@ -45,6 +46,7 @@ export default function AdminTorneo() {
   const [savingChanges, setSavingChanges] = useState(false);
   const [showCrearTorneo, setShowCrearTorneo] = useState(false);
   const [showJornadasFinales, setShowJornadasFinales] = useState(false);
+  const [showWoDrawer, setShowWoDrawer] = useState(false);
 
   useEffect(() => {
     // Seleccionar automáticamente el primer torneo cuando cargue la página
@@ -382,39 +384,58 @@ export default function AdminTorneo() {
             </Select>
           </FormControl>
           
-          <Button
-            variant="contained"
-            startIcon={<EditIcon />}
-            onClick={() => setShowCrearTorneo(true)}
-            sx={{
-              minWidth: 140,
-              height: 56,
-              background: "linear-gradient(45deg, #FF6B6B, #4ECDC4)",
-              "&:hover": {
-                background: "linear-gradient(45deg, #FF5252, #26C6DA)"
-              }
-            }}
-          >
-            Crear Torneo
-          </Button>
-          
-          <Button
-            variant="contained"
-            startIcon={<EmojiEventsIcon />}
-            onClick={() => setShowJornadasFinales(true)}
-            sx={{
-              minWidth: 140,
-              height: 56,
-              ml: 2,
-              background: "linear-gradient(45deg, #FFD700, #FFA500)",
-              color: "white",
-              "&:hover": {
-                background: "linear-gradient(45deg, #FFC107, #FF9800)"
-              }
-            }}
-          >
-            Jornadas Finales
-          </Button>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              startIcon={<EditIcon />}
+              onClick={() => setShowCrearTorneo(true)}
+              sx={{
+                minWidth: 140,
+                height: 56,
+                background: "linear-gradient(45deg, #FF6B6B, #4ECDC4)",
+                "&:hover": {
+                  background: "linear-gradient(45deg, #FF5252, #26C6DA)"
+                }
+              }}
+            >
+              Crear Torneo
+            </Button>
+            
+            <Button
+              variant="contained"
+              startIcon={<EmojiEventsIcon />}
+              onClick={() => setShowJornadasFinales(true)}
+              sx={{
+                minWidth: 140,
+                height: 56,
+                background: "linear-gradient(45deg, #FFD700, #FFA500)",
+                color: "white",
+                "&:hover": {
+                  background: "linear-gradient(45deg, #FFC107, #FF9800)"
+                }
+              }}
+            >
+              Jornadas Finales
+            </Button>
+
+            {/* Nuevo botón para WO */}
+            <Button
+              variant="contained"
+              startIcon={<LockIcon />}
+              onClick={() => setShowWoDrawer(true)}
+              sx={{
+                minWidth: 140,
+                height: 56,
+                background: "linear-gradient(45deg, #FF9800, #FF6B6B)",
+                color: "white",
+                "&:hover": {
+                  background: "linear-gradient(45deg, #FFB74D, #FF5252)"
+                }
+              }}
+            >
+              Analizar WO
+            </Button>
+          </Box>
         </Box>
 
         {getTorneoSeleccionado() && (
@@ -758,6 +779,13 @@ export default function AdminTorneo() {
         open={showJornadasFinales}
         onClose={() => setShowJornadasFinales(false)}
         onJornadasFinalesCreated={handleJornadasFinalesCreated}
+      />
+
+      {/* Drawer para analizar WO */}
+      <CrearWoDrawer
+        open={showWoDrawer}
+        onClose={() => setShowWoDrawer(false)}
+        jornadas={jornadas}
       />
     </Box>
   );

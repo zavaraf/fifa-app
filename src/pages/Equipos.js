@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Box,
   Typography,
@@ -23,12 +23,17 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import useEquipos from "../hooks/useEquipos";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext"; // Agrega este import
 
 export default function Equipos() {
   const { equipos, loading, fetchEquipos, modificarEquipo } = useEquipos();
+  const { user } = useContext(AuthContext); // Obtén el usuario desde AuthContext
+  const isAdmin = user?.rolesDes?.includes("Admin");
+
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedEquipo, setSelectedEquipo] = useState(null);
@@ -119,7 +124,27 @@ export default function Equipos() {
               filteredEquipos.map((equipo) => (
                 <TableRow key={equipo.id}>
                   <TableCell>
-                    <Avatar src={equipo.img} alt={equipo.nombre} />
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Avatar
+                        src={equipo.img}
+                        alt={equipo.nombre}
+                        component={RouterLink}
+                        to={`/equipo/${equipo.id}`}
+                        sx={{ cursor: "pointer" }}
+                      />
+                      {equipo.postfifa && (
+                        <IconButton
+                          component="a"
+                          href={equipo.postfifa}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          size="small"
+                          sx={{ ml: 1, color: "success.main" }}
+                        >
+                          <CheckCircleIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <Typography
@@ -129,6 +154,8 @@ export default function Equipos() {
                         color: "primary.main",
                         textDecoration: "none",
                         fontWeight: 600,
+                        display: "inline-flex",
+                        alignItems: "center",
                         "&:hover": { textDecoration: "underline", color: "primary.dark" },
                       }}
                     >
@@ -204,29 +231,6 @@ export default function Equipos() {
             sx={{ mb: 1 }}
           />
           <TextField
-            label="WhatsApp"
-            name="whatsapp"
-            value={selectedEquipo?.whatsapp || ""}
-            onChange={e =>
-              setSelectedEquipo(eq => ({ ...eq, whatsapp: e.target.value }))
-            }
-            placeholder="Ej: +34612345678"
-            fullWidth
-            size="small"
-            sx={{ mb: 1 }}
-          />
-          <TextField
-            label="Manager"
-            name="manager"
-            value={selectedEquipo?.manager || ""}
-            onChange={e =>
-              setSelectedEquipo(eq => ({ ...eq, manager: e.target.value }))
-            }
-            fullWidth
-            size="small"
-            sx={{ mb: 1 }}
-          />
-          <TextField
             label="Imagen"
             name="img"
             value={selectedEquipo?.img || ""}
@@ -259,14 +263,32 @@ export default function Equipos() {
             size="small"
             sx={{ mb: 1 }}
           />
+          {/* Solo mostrar PostFifa si es admin */}
+          {isAdmin && (
+            <TextField
+              label="PostFifa"
+              name="postfifa"
+              value={selectedEquipo?.postfifa || ""}
+              onChange={e =>
+                setSelectedEquipo(eq => ({ ...eq, postfifa: e.target.value }))
+              }
+              placeholder="URL al post"
+              fullWidth
+              size="small"
+              sx={{ mb: 1 }}
+            />
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button variant="contained" onClick={handleSave}>
-            Guardar
-          </Button>
+          <>
+            <Button onClick={handleClose}>Cancelar</Button>
+            <Button variant="contained" onClick={handleSave}>
+              Guardar
+            </Button>
+          </>
         </DialogActions>
       </Dialog>
     </Box>
   );
 }
+
