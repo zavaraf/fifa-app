@@ -68,13 +68,60 @@ export default function Navbar({ toggleTheme, themeMode }) {
               src="https://fifa-xgamers.com/ext/planetstyles/flightdeck/store/2a01bbb.png"
               alt="Logo"
               style={{
-                width: 40,
+                width: window.innerWidth < 600 ? 32 : 40,
                 marginRight: 8,
                 borderRadius: 4,
                 background: "#fff",
               }}
             />
             FIFA XGamers
+            {/* Divider visual */}
+            <span
+              style={{
+                display: 'inline-block',
+                height: 28,
+                width: 1,
+                background: '#bbb',
+                margin: '0 12px 0 14px',
+                opacity: 0.5,
+                verticalAlign: 'middle',
+              }}
+            />
+            {/* Logo Sofifa con efectos visuales y texto */}
+            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <a
+                href="https://sofifa.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Visitar Sofifa.com (colaboración)"
+                style={{
+                  display: 'inline-block',
+                  transition: 'transform 0.2s',
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.transform = 'scale(1.12)';
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                <img
+                  src="/fifa-app/img/sofifa-logo.png"
+                  alt="Sofifa Logo"
+                  title="Colaboración con Sofifa"
+                  style={{
+                    width: window.innerWidth < 600 ? 32 : 40,
+                    borderRadius: 4,
+                    background: "#fff",
+                    boxShadow: '0 0 2px #888',
+                    verticalAlign: 'middle',
+                  }}
+                />
+              </a>
+              <span style={{ fontSize: 10, color: '#888', marginTop: 0, lineHeight: 1, letterSpacing: 0.2 }}>
+                Colaboración
+              </span>
+            </span>
           </Typography>
           {/* Menú de navegación solo en desktop */}
           {!isMobile && user && (

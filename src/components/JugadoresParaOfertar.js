@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import useJugadores from "../hooks/useJugadores";
 import {
   Grid,
   Paper,
@@ -34,6 +35,8 @@ export default function JugadoresParaOfertar({
   // Estado local para el jugador seleccionado y el drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [jugadorSeleccionado, setJugadorSeleccionado] = useState(null);
+  const [precioSofifa, setPrecioSofifa] = useState(0);
+  const { fetchDetallesJugadorSofifa } = useJugadores();
 
   // Estado local para el monto de la oferta
   const [ofertaInput, setOfertaInput] = useState({});
@@ -58,8 +61,22 @@ export default function JugadoresParaOfertar({
   };
 
   // Abre el drawer para ofertar por un jugador
-  const handleAbrirDrawer = (jugador) => {
+  const handleAbrirDrawer = async (jugador) => {
     setJugadorSeleccionado(jugador);
+    let precio = 0;
+    if (jugador.idsofifa) {
+      try {
+        const detalles = await fetchDetallesJugadorSofifa(jugador.idsofifa);
+        precio = detalles?.data?.price ? Number(detalles.data.price) : 0;
+      } catch (e) {
+        precio = 0;
+      }
+    }
+    setPrecioSofifa(precio);
+    setOfertaInput((prev) => ({
+      ...prev,
+      [jugador.id || jugador.nombreCompleto]: precio ? precio.toLocaleString("es-MX") : "0",
+    }));
     setDrawerOpen(true);
   };
 
@@ -211,19 +228,21 @@ export default function JugadoresParaOfertar({
                       </Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", ml: "auto" }}>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleAbrirDrawer(jugador)}
-                        sx={{
-                          fontWeight: 700,
-                          borderRadius: 2,
-                          minWidth: 100,
-                          ml: 2,
-                        }}
-                      >
-                        Ofertar
-                      </Button>
+                      {(user?.rolesDes?.includes("Admin") || user?.rolesDes?.includes("Manager")) && (
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => handleAbrirDrawer(jugador)}
+                          sx={{
+                            fontWeight: 700,
+                            borderRadius: 2,
+                            minWidth: 100,
+                            ml: 2,
+                          }}
+                        >
+                          Ofertar
+                        </Button>
+                      )}
                     </Box>
                   </Box>
                 </Paper>
@@ -268,6 +287,7 @@ export default function JugadoresParaOfertar({
         manager={user?.usuario || user?.nombreUsuario || user?.username || user?.nombre || "usuario"}
         onOfertar={handleOfertarDrawer}
         loading={loadingDrawer}
+        precioSofifa={precioSofifa}
       />
     </Paper>
   );

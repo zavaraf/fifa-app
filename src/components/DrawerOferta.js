@@ -6,19 +6,21 @@ import {
   Button,
   Avatar,
 } from "@mui/material";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 
-export default function DrawerOferta({
-  open,
-  onClose,
-  monto,
-  setMonto,
-  equipo,
-  manager,
-  onOfertar,
-  loading,
-  ofertaInicial,
-}) {
+export default function DrawerOferta(props) {
+  const {
+    open,
+    onClose,
+    monto,
+    setMonto,
+    equipo,
+    manager,
+    onOfertar,
+    loading,
+    ofertaInicial,
+    precioSofifa
+  } = props;
   
   // Formatea el monto solo para mostrarlo, pero el valor real en el estado es solo números
   const formatCantidad = (value) => {
@@ -35,6 +37,14 @@ export default function DrawerOferta({
     },
     [setMonto]
   );
+
+  // Si el precioSofifa cambia y el Drawer está abierto, inicializa el monto
+  useEffect(() => {
+    if (open) {
+      setMonto(precioSofifa ? precioSofifa.toString() : "0");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [precioSofifa, open]);
 
   return (
     <Drawer

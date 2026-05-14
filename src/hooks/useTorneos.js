@@ -26,12 +26,38 @@ export default function useTorneos() {
       console.log("URL construida para obtener la tabla general:", url);
 
       const response = await axios.get(url);
-      setTablaGeneral(response.data.tablaGeneral);
-      setJornadas(response.data.jornadas);
+      console.log("Respuesta de tabla general:", response.data);
+      
+      // Verificar si la respuesta es HTML (sesión expirada)
+      if (typeof response.data === 'string' && 
+          (response.data.includes('<!DOCTYPE HTML') || 
+           response.data.includes('Sesión no válida') || 
+           response.data.includes('Inactividad de Sesión'))) {
+        console.error("Sesión expirada detectada en fetchTorneoGeneral");
+        sessionStorage.clear();
+        setError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+        window.location.href = '/fifa-app/login';
+        return;
+      }
+      
+      setTablaGeneral(response.data.tablaGeneral || []);
+      setJornadas(response.data.jornadas || []);
       setGolesTorneo(response.data.golesTorneo || []); // Asegúrate de manejar el caso donde no haya goles
       setGolesTorneoEquipo(response.data.golesTorneoEquipo || []); // Agregar goles del equipo del usuario
     } catch (error) {
       console.error("Error al cargar la tabla general:", error);
+      
+      // Verificar si el error contiene HTML de sesión expirada
+      if (error.response && typeof error.response.data === 'string' && 
+          (error.response.data.includes('<!DOCTYPE HTML') || 
+           error.response.data.includes('Sesión no válida'))) {
+        console.error("Sesión expirada detectada en error response de tabla general");
+        sessionStorage.clear();
+        setError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+        window.location.href = '/fifa-app/login';
+        return;
+      }
+      
       setError("Error al cargar la tabla general.");
     }
   };
@@ -43,12 +69,38 @@ export default function useTorneos() {
       console.log("URL para obtener grupos del torneo:", url);
 
       const response = await axios.get(url);
-      console.log("Grupos del torneo obtenidos:", response.data);
+      console.log("Respuesta completa:", response);
+      console.log("Datos de respuesta:", response.data);
+      
+      // Verificar si la respuesta es HTML (sesión expirada)
+      if (typeof response.data === 'string' && 
+          (response.data.includes('<!DOCTYPE HTML') || 
+           response.data.includes('Sesión no válida') || 
+           response.data.includes('Inactividad de Sesión'))) {
+        console.error("Sesión expirada detectada en fetchGruposTorneo");
+        sessionStorage.clear();
+        setError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+        window.location.href = '/fifa-app/login';
+        return;
+      }
+      
       const grupos = response.data || [];
       setGrupos(grupos); // Actualiza el estado con los grupos obtenidos
       sessionStorage.setItem("gruposTorneo", JSON.stringify(grupos)); // Guarda los grupos en sesión
     } catch (error) {
       console.error("Error al obtener los grupos del torneo:", error);
+      
+      // Verificar si el error contiene HTML de sesión expirada
+      if (error.response && typeof error.response.data === 'string' && 
+          (error.response.data.includes('<!DOCTYPE HTML') || 
+           error.response.data.includes('Sesión no válida'))) {
+        console.error("Sesión expirada detectada en error response");
+        sessionStorage.clear();
+        setError("Sesión expirada. Por favor, inicia sesión nuevamente.");
+        window.location.href = '/fifa-app/login';
+        return;
+      }
+      
       setError("Error al obtener los grupos del torneo.");
     }
   };

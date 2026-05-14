@@ -92,11 +92,6 @@ export default function TablaJugadores({ jugadores, loading, onEdit }) {
                           textDecoration: "underline",
                           color: "primary.dark",
                         },
-                        maxWidth: { xs: 120, md: 140 },
-                        display: "inline-block",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
                         fontSize: { xs: "0.875rem", md: "1rem" },
                       }}
                       title={jugador.sobrenombre}

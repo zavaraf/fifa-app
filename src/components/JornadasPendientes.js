@@ -98,8 +98,17 @@ const JornadasPendientes = ({ jornadas, updateGlobalData, onViewMore }) => {
               <Avatar
                 src={jor.imgLocal}
                 alt={jor.nombreEquipoLocal}
-                sx={{ width: 28, height: 28, mx: 1 }}
-              />
+                sx={{ 
+                  width: 28, 
+                  height: 28, 
+                  mx: 1,
+                  bgcolor: 'primary.main',
+                  fontSize: 12,
+                  fontWeight: 600
+                }}
+              >
+                {!jor.imgLocal && (jor.nombreEquipoLocal || "?").charAt(0).toUpperCase()}
+              </Avatar>
               <Typography
                 variant="body2"
                 sx={{
@@ -113,8 +122,17 @@ const JornadasPendientes = ({ jornadas, updateGlobalData, onViewMore }) => {
               <Avatar
                 src={jor.imgVisita}
                 alt={jor.nombreEquipoVisita}
-                sx={{ width: 28, height: 28, mx: 1 }}
-              />
+                sx={{ 
+                  width: 28, 
+                  height: 28, 
+                  mx: 1,
+                  bgcolor: 'secondary.main',
+                  fontSize: 12,
+                  fontWeight: 600
+                }}
+              >
+                {!jor.imgVisita && (jor.nombreEquipoVisita || "?").charAt(0).toUpperCase()}
+              </Avatar>
               <Chip
                 label="Pendiente"
                 color="warning"

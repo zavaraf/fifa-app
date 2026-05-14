@@ -8,7 +8,7 @@ export default function TablaGoleo({ goleo = [] }) {
   // Función para acortar el nombre
   const shortName = (name) => {
     if (!name) return "";
-    return name.length > 10 ? name.slice(0, 10) + "..." : name;
+    return name.length > 22 ? name.slice(0, 22) + "..." : name;
   };
 
   return (

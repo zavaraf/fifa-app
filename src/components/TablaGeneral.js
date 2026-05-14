@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -14,7 +14,17 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 
 export default function TablaGeneral({ data }) {
-  console.log("Datos de la tabla general:", data);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 600);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  //console.log("Datos de la tabla general:", data);
   return (
     <TableContainer
       component={Paper}
@@ -28,11 +38,11 @@ export default function TablaGeneral({ data }) {
       <Table size="small">
         <TableHead>
           <TableRow>
-            {/* Nueva columna para el índice */}
+            {/* Columna combinada para índice y equipo */}
             <TableCell
               sx={{
                 textAlign: "center",
-                width: "5%",
+                width: { xs: 24, sm: 28, md: 32 },
                 bgcolor: (theme) =>
                   theme.palette.mode === "dark"
                     ? theme.palette.grey[900]
@@ -43,15 +53,15 @@ export default function TablaGeneral({ data }) {
                 position: "sticky",
                 top: 0,
                 zIndex: 1,
+                p: 0.25,
               }}
             >
               #
             </TableCell>
-            {/* Imagen y nombre del equipo alineados a la izquierda, ocupan el 30% */}
             <TableCell
               sx={{
                 textAlign: "left",
-                width: "50%",
+                width: { xs: "80%", sm: "68%", md: "72%", lg: "75%" },
                 bgcolor: (theme) =>
                   theme.palette.mode === "dark"
                     ? theme.palette.grey[900]
@@ -62,160 +72,20 @@ export default function TablaGeneral({ data }) {
                 position: "sticky",
                 top: 0,
                 zIndex: 1,
+                pr: { xs: 2, sm: 8, md: 16, lg: 22 },
               }}
             >
               Equipo
             </TableCell>
             {/* Columnas de PJ a PTS alineadas a la derecha, ocupan el 65% */}
-            <TableCell
-              sx={{
-                textAlign: "right",
-                width: "5%",
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? theme.palette.grey[900]
-                    : "#e3e3e3",
-                color: (theme) => theme.palette.text.primary,
-                fontWeight: 700,
-                fontSize: 15,
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-              }}
-            >
-              PJ
-            </TableCell>
-            <TableCell
-              sx={{
-                textAlign: "right",
-                width: "5%",
-                display: { xs: "none", sm: "table-cell" },
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? theme.palette.grey[900]
-                    : "#e3e3e3",
-                color: (theme) => theme.palette.text.primary,
-                fontWeight: 700,
-                fontSize: 15,
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-              }}
-            >
-              PG
-            </TableCell>
-            <TableCell
-              sx={{
-                textAlign: "right",
-                width: "5%",
-                display: { xs: "none", sm: "table-cell" },
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? theme.palette.grey[900]
-                    : "#e3e3e3",
-                color: (theme) => theme.palette.text.primary,
-                fontWeight: 700,
-                fontSize: 15,
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-              }}
-            >
-              PE
-            </TableCell>
-            <TableCell
-              sx={{
-                textAlign: "right",
-                width: "5%",
-                display: { xs: "none", sm: "table-cell" },
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? theme.palette.grey[900]
-                    : "#e3e3e3",
-                color: (theme) => theme.palette.text.primary,
-                fontWeight: 700,
-                fontSize: 15,
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-              }}
-            >
-              PP
-            </TableCell>
-            <TableCell
-              sx={{
-                textAlign: "right",
-                width: "5%",
-                display: { xs: "none", sm: "table-cell" },
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? theme.palette.grey[900]
-                    : "#e3e3e3",
-                color: (theme) => theme.palette.text.primary,
-                fontWeight: 700,
-                fontSize: 15,
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-              }}
-            >
-              GF
-            </TableCell>
-            <TableCell
-              sx={{
-                textAlign: "right",
-                width: "5%",
-                display: { xs: "none", sm: "table-cell" },
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? theme.palette.grey[900]
-                    : "#e3e3e3",
-                color: (theme) => theme.palette.text.primary,
-                fontWeight: 700,
-                fontSize: 15,
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-              }}
-            >
-              GE
-            </TableCell>
-            <TableCell
-              sx={{
-                textAlign: "right",
-                width: "5%",
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? theme.palette.grey[900]
-                    : "#e3e3e3",
-                color: (theme) => theme.palette.text.primary,
-                fontWeight: 700,
-                fontSize: 15,
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-              }}
-            >
-              DIF
-            </TableCell>
-            <TableCell
-              sx={{
-                textAlign: "right",
-                width: "5%",
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? theme.palette.grey[900]
-                    : "#e3e3e3",
-                color: (theme) => theme.palette.text.primary,
-                fontWeight: 700,
-                fontSize: 15,
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-              }}
-            >
-              PTS
-            </TableCell>
+            <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, bgcolor: (theme) => theme.palette.mode === "dark" ? theme.palette.grey[900] : "#e3e3e3", color: (theme) => theme.palette.text.primary, fontWeight: 400, fontSize: 13, position: "sticky", top: 0, zIndex: 1, p: 0.5 }}>PJ</TableCell>
+            <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, display: { xs: "none", sm: "table-cell" }, bgcolor: (theme) => theme.palette.mode === "dark" ? theme.palette.grey[900] : "#e3e3e3", color: (theme) => theme.palette.text.primary, fontWeight: 400, fontSize: 13, position: "sticky", top: 0, zIndex: 1, p: 0.5 }}>PG</TableCell>
+            <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, display: { xs: "none", sm: "table-cell" }, bgcolor: (theme) => theme.palette.mode === "dark" ? theme.palette.grey[900] : "#e3e3e3", color: (theme) => theme.palette.text.primary, fontWeight: 400, fontSize: 13, position: "sticky", top: 0, zIndex: 1, p: 0.5 }}>PE</TableCell>
+            <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, display: { xs: "none", sm: "table-cell" }, bgcolor: (theme) => theme.palette.mode === "dark" ? theme.palette.grey[900] : "#e3e3e3", color: (theme) => theme.palette.text.primary, fontWeight: 400, fontSize: 13, position: "sticky", top: 0, zIndex: 1, p: 0.5 }}>PP</TableCell>
+            <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, display: { xs: "none", sm: "table-cell" }, bgcolor: (theme) => theme.palette.mode === "dark" ? theme.palette.grey[900] : "#e3e3e3", color: (theme) => theme.palette.text.primary, fontWeight: 400, fontSize: 13, position: "sticky", top: 0, zIndex: 1, p: 0.5 }}>GF</TableCell>
+            <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, bgcolor: (theme) => theme.palette.mode === "dark" ? theme.palette.grey[900] : "#e3e3e3", color: (theme) => theme.palette.text.primary, fontWeight: 400, fontSize: 13, position: "sticky", top: 0, zIndex: 1, p: 0.5 }}> {window.innerWidth < 600 ? 'Goles' : 'GE'}</TableCell>
+            <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, bgcolor: (theme) => theme.palette.mode === "dark" ? theme.palette.grey[900] : "#e3e3e3", color: (theme) => theme.palette.text.primary, fontWeight: 400, fontSize: 13, position: "sticky", top: 0, zIndex: 1, p: 0.5 }}>DIF</TableCell>
+            <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, bgcolor: (theme) => theme.palette.mode === "dark" ? theme.palette.grey[900] : "#e3e3e3", color: (theme) => theme.palette.text.primary, fontWeight: 400, fontSize: 13, position: "sticky", top: 0, zIndex: 1, p: 0.5, pr: 2 }}>PTS</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -237,18 +107,17 @@ export default function TablaGeneral({ data }) {
                 },
               }}
             >
-              {/* Nueva celda para el índice */}
-              <TableCell
-                sx={{
-                  textAlign: "center",
-                  width: "5%",
-                  fontWeight: index === 0 ? 700 : 400,
-                }}
-              >
-                {index + 1}
+              {/* Celda para índice */}
+              <TableCell sx={{ textAlign: "center", width: { xs: 24, sm: 28, md: 32 }, p: 0.25 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: index === 0 ? 700 : 400 }}
+                >
+                  {index + 1}
+                </Typography>
               </TableCell>
-              {/* Imagen y nombre del equipo alineados a la izquierda, ocupan el 30% */}
-              <TableCell sx={{ textAlign: "left", width: "50%" }}>
+              {/* Celda para nombre del equipo */}
+              <TableCell sx={{ textAlign: "left", width: { xs: "80%", sm: "68%", md: "72%", lg: "75%" }, pr: { xs: 2, sm: 8, md: 16, lg: 22 } }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <img
                     src={row.img}
@@ -262,34 +131,34 @@ export default function TablaGeneral({ data }) {
                       variant="body2"
                       sx={{
                         fontWeight: index === 0 ? 700 : 400,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: { xs: 60, sm: 110 },
                         color: (theme) => theme.palette.primary.main,
                         textDecoration: "none",
                         "&:hover": { textDecoration: "underline", color: (theme) => theme.palette.primary.dark },
+                        
+                        // --- LÍNEAS A AGREGAR ---
+                        whiteSpace: 'nowrap',       // Evita que el texto salte a la siguiente línea.
+                        overflow: 'hidden',         // Oculta el texto que se desborde del contenedor.
+                        textOverflow: 'ellipsis',   // Muestra "..." en el texto que fue ocultado.
                       }}
                     >
-                      {window.innerWidth < 600 
-                        ? row.nombreEquipo?.substring(0, 6) + (row.nombreEquipo?.length > 6 ? "..." : "")
-                        : row.nombreEquipo?.substring(0, 10) + (row.nombreEquipo?.length > 10 ? "..." : "")
-                      }
+                      {row.nombreEquipo}
                     </Typography>
                   </Tooltip>
                 </Box>
               </TableCell>
               {/* Columnas de PJ a PTS alineadas a la derecha, ocupan el 65% */}
-              <TableCell sx={{ textAlign: "right", width: "5%" }}>{row.pj}</TableCell>
-              <TableCell sx={{ textAlign: "right", width: "5%", display: { xs: "none", sm: "table-cell" } }}>{row.pg}</TableCell>
-              <TableCell sx={{ textAlign: "right", width: "5%", display: { xs: "none", sm: "table-cell" } }}>{row.pe}</TableCell>
-              <TableCell sx={{ textAlign: "right", width: "5%", display: { xs: "none", sm: "table-cell" } }}>{row.pp}</TableCell>
-              <TableCell sx={{ textAlign: "right", width: "5%", display: { xs: "none", sm: "table-cell" } }}>{row.gf}</TableCell>
-              <TableCell sx={{ textAlign: "right", width: "5%", display: { xs: "none", sm: "table-cell" } }}>{row.ge}</TableCell>
-              <TableCell sx={{ textAlign: "right", width: "5%" }}>
-                {window.innerWidth < 600 ? `${row.gf}:${row.ge}` : row.dif}
+              <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, p: 0.5 }}>{row.pj}</TableCell>
+              <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, display: { xs: "none", sm: "table-cell" }, p: 0.5 }}>{row.pg}</TableCell>
+              <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, display: { xs: "none", sm: "table-cell" }, p: 0.5 }}>{row.pe}</TableCell>
+              <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, display: { xs: "none", sm: "table-cell" }, p: 0.5 }}>{row.pp}</TableCell>
+              <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, display: { xs: "none", sm: "table-cell" }, p: 0.5 }}>{row.gf}</TableCell>
+              <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, p: 0.5 }}>
+                {window.innerWidth < 600 ? `${row.gf}:${row.ge}` : row.ge}
               </TableCell>
-              <TableCell sx={{ textAlign: "right", width: "5%" }}>{row.pts}</TableCell>
+              <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, p: 0.5 }}>
+                {row.dif}
+              </TableCell>
+              <TableCell sx={{ textAlign: "right", width: "1%", minWidth: 28, p: 0.5, pr: 2 }}>{row.pts}</TableCell>
             </TableRow>
           ))}
         </TableBody>

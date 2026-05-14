@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import {
   Drawer,
   Box,
@@ -8,6 +9,7 @@ import {
   Autocomplete,
   InputAdornment,
   IconButton,
+  CircularProgress
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useJugadores from "../hooks/useJugadores";
@@ -26,7 +28,86 @@ export default function EditJugadorDialog({ open, onClose, jugador, equipos: equ
     equipo: "",
     costo: "",
   });
-  const { updateJugador, createJugador } = useJugadores();
+  const { updateJugador, createJugador, fetchDetallesJugadorSofifa } = useJugadores();
+  const [consultandoSofifa, setConsultandoSofifa] = useState(false);
+  const [showCosto, setShowCosto] = useState(false);
+  const [costoEditable, setCostoEditable] = useState(true);
+  const [tipoOperacion, setTipoOperacion] = useState("baja"); // "venta" o "baja"
+  // Acción al hacer click en el botón Venta
+  const handleOperacion = async () => {
+    if (!form.idsofifa) return;
+    setConsultandoSofifa(true);
+    let errorServicio = false;
+    let nuevoCosto = "";
+    let nuevoEquipo = form.equipo;
+    try {
+      const detalles = await fetchDetallesJugadorSofifa(form.idsofifa);
+      const data = detalles?.data;
+      if (data && data.price) {
+        if (tipoOperacion === "baja") {
+          // Baja: precio 90% y no editable
+          nuevoCosto = Math.round(data.price * 0.9);
+          setCostoEditable(false);
+          nuevoEquipo = "Agente Libre";
+        } else {
+          // Venta: precio Sofifa y editable
+          nuevoCosto = data.price;
+          setCostoEditable(true);
+        }
+      } else {
+        errorServicio = true;
+      }
+    } catch (e) {
+      errorServicio = true;
+    }
+    if (errorServicio) {
+      setCostoEditable(true);
+      nuevoCosto = "";
+      if (tipoOperacion === "baja") {
+        nuevoEquipo = "Agente Libre";
+      }
+    }
+    setForm((prev) => ({
+      ...prev,
+      costo: nuevoCosto,
+      equipo: nuevoEquipo,
+    }));
+    setShowCosto(true);
+    setConsultandoSofifa(false);
+  };
+  // Consulta Sofifa y mapea los datos al formulario
+  const handleConsultarSofifa = async () => {
+    if (!form.idsofifa) return;
+    setConsultandoSofifa(true);
+    const detalles = await fetchDetallesJugadorSofifa(form.idsofifa);
+    const data = detalles?.data;
+    if (data) {
+      setForm((prev) => ({
+        ...prev,
+        idsofifa: data.id || prev.idsofifa,
+        sobrenombre: data.commonName || "",
+        nombreCompleto: `${data.firstName || ""} ${data.lastName || ""}`.trim(),
+        img: (() => {
+          let idStr = String(data.id);
+          if (idStr.length === 5) {
+            idStr = "0" + idStr;
+          }
+          if (idStr.length === 6) {
+            const part1 = idStr.slice(0, 3);
+            const part2 = idStr.slice(3, 6);
+            const version = data.version || "26";
+            return `https://cdn.sofifa.net/players/${part1}/${part2}/${version}_120.png`;
+          }
+          return "";
+        })(),
+        raiting: data.overallRating || "",
+       
+       
+        link: `https://sofifa.com/player/${data.id}`,
+      }));
+    }
+    setConsultandoSofifa(false);
+  };
   const { equipos, fetchEquipos } = useEquipos();
   const { user } = useContext(AuthContext);
   const [saving, setSaving] = useState(false);
@@ -181,14 +262,25 @@ export default function EditJugadorDialog({ open, onClose, jugador, equipos: equ
             mb: 3,
           }}
         >
-          <TextField
-            label="ID Sofifa"
-            name="idsofifa"
-            value={form.idsofifa}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-          />
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <TextField
+              label="ID Sofifa"
+              name="idsofifa"
+              value={form.idsofifa}
+              onChange={handleChange}
+              fullWidth
+              size="small"
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleConsultarSofifa}
+              disabled={!form.idsofifa || consultandoSofifa}
+              sx={{ minWidth: 40 }}
+            >
+              {consultandoSofifa ? <CircularProgress size={18} /> : "Consultar"}
+            </Button>
+          </Box>
           <TextField
             label="Nombre Corto"
             name="sobrenombre"
@@ -241,19 +333,58 @@ export default function EditJugadorDialog({ open, onClose, jugador, equipos: equ
             )}
             isOptionEqualToValue={(option, value) => option.nombre === value.nombre}
           />
-          <TextField
-            label="Costo"
-            name="costo"
-            value={formatCurrency(form.costo)}
-            onChange={handleCostoChange}
-            fullWidth
-            size="small"
-            InputProps={{
-              startAdornment: <InputAdornment position="start">$</InputAdornment>,
-              inputMode: "numeric",
-              pattern: "[0-9]*",
-            }}
-          />
+          {/* ...existing code... */}
+          {/* Selector Venta/Baja */}
+          <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+            <InputLabel id="tipo-operacion-label">Tipo de operación</InputLabel>
+            <Select
+              labelId="tipo-operacion-label"
+              value={tipoOperacion}
+              label="Tipo de operación"
+              onChange={e => setTipoOperacion(e.target.value)}
+            >
+              <MenuItem value="baja">Baja</MenuItem>
+              <MenuItem value="venta">Venta</MenuItem>
+            </Select>
+          </FormControl>
+          {/* Botón para ejecutar la operación */}
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleOperacion}
+            disabled={!form.idsofifa || consultandoSofifa}
+            sx={{ alignSelf: "flex-start", mb: 1 }}
+          >
+            {consultandoSofifa ? <CircularProgress size={18} /> : tipoOperacion === "baja" ? "Baja" : "Venta"}
+          </Button>
+          {(showCosto || !!form.costo) && (
+            <TextField
+              label="Costo"
+              name="costo"
+              value={formatCurrency(form.costo)}
+              onChange={
+                // Solo editable si: ya tiene valor previo, o es venta, o el servicio falló
+                (tipoOperacion === "venta" || costoEditable || (!!form.costo && tipoOperacion !== "baja"))
+                  ? handleCostoChange
+                  : undefined
+              }
+              fullWidth
+              size="small"
+              InputProps={{
+                startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                inputMode: "numeric",
+                pattern: "[0-9]*",
+                readOnly: !((tipoOperacion === "venta" || costoEditable || (!!form.costo && tipoOperacion !== "baja")))
+              }}
+              helperText={
+                tipoOperacion === "baja"
+                  ? costoEditable
+                    ? "Puedes editar el costo porque el servicio no respondió." 
+                    : "Precio de baja calculado automáticamente (90% del valor Sofifa)"
+                  : "Puedes editar el precio de venta inicial (valor Sofifa)"
+              }
+            />
+          )}
         </Box>
 
         {/* Actions */}

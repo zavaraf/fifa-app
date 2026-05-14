@@ -13,13 +13,15 @@ import TablaJugadores from "../components/TablaJugadores";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Jugadores() {
-  const { jugadores, loading, fetchAllJugadores, updateJugador, createJugador } = useJugadores();
+  const { jugadores, loading, fetchAllJugadores, updateJugador, createJugador, fetchJugadorSofifaById } = useJugadores();
   const { user } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
   const [editJugador, setEditJugador] = useState(null);
   const [form, setForm] = useState({ nombre: "", equipo: "", img: "", rating: "" });
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [sofifaJugador, setSofifaJugador] = useState(null);
+  const [sofifaLoading, setSofifaLoading] = useState(false);
   const rowsPerPage = 50;
 
   useEffect(() => {
@@ -36,11 +38,29 @@ export default function Jugadores() {
     )
     .sort((a, b) => (Number(b.raiting) || 0) - (Number(a.raiting) || 0));
 
-  // Paginación de jugadores filtrados
-  const paginatedJugadores = filteredJugadores.slice(
+  // Buscar en Sofifa si el filtro es numérico y no hay resultados
+  useEffect(() => {
+    const buscarSofifa = async () => {
+      setSofifaJugador(null);
+      if (/^\d+$/.test(search) && filteredJugadores.length === 0 && search.length > 0) {
+        setSofifaLoading(true);
+        const jugador = await fetchJugadorSofifaById(search);
+        setSofifaJugador(jugador);
+        setSofifaLoading(false);
+      }
+    };
+    buscarSofifa();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, filteredJugadores.length]);
+
+  // Paginación de jugadores filtrados (incluye Sofifa si aplica)
+  let paginatedJugadores = filteredJugadores.slice(
     (page - 1) * rowsPerPage,
     page * rowsPerPage
   );
+  if (filteredJugadores.length === 0 && sofifaJugador) {
+    paginatedJugadores = [sofifaJugador];
+  }
 
   const equipos = [
     ...Array.from(
@@ -132,7 +152,7 @@ export default function Jugadores() {
       </Box>
       <TablaJugadores
         jugadores={paginatedJugadores}
-        loading={loading}
+        loading={loading || sofifaLoading}
         onEdit={isAdmin ? handleOpenEdit : () => {}}
       />
       {filteredJugadores.length > rowsPerPage && (

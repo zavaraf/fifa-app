@@ -70,10 +70,42 @@ export default function Torneos() {
     try {
       if (torneo.tipoTorneo === 2) {
         await fetchGruposTorneo(torneo.id);
-        const gruposTorneo = JSON.parse(sessionStorage.getItem("gruposTorneo")) || [];
-        setGrupos(gruposTorneo);
+        
+        // Validar que los grupos se obtuvieron correctamente
+        const gruposTorneoRaw = sessionStorage.getItem("gruposTorneo");
+        console.log("Datos raw obtenidos:", gruposTorneoRaw);
+        
+        // Verificar si la respuesta es HTML (sesión expirada)
+        if (typeof gruposTorneoRaw === 'string' && 
+            (gruposTorneoRaw.includes('<!DOCTYPE HTML') || 
+             gruposTorneoRaw.includes('Sesión no válida') || 
+             gruposTorneoRaw.includes('Inactividad de Sesión'))) {
+          console.error("Sesión expirada detectada en handleTorneoSelect");
+          sessionStorage.clear();
+          window.location.href = '/fifa-app/login'; // Redirigir al login
+          return;
+        }
+        
+        try {
+          const gruposTorneo = JSON.parse(gruposTorneoRaw || "[]");
+          if (Array.isArray(gruposTorneo)) {
+            setGrupos(gruposTorneo);
+          } else {
+            console.error("Datos de grupos inválidos:", gruposTorneo);
+            setGrupos([]);
+          }
+        } catch (parseError) {
+          console.error("Error al parsear grupos:", parseError);
+          sessionStorage.removeItem("gruposTorneo");
+          setGrupos([]);
+        }
       }
       await fetchTorneoGeneral();
+    } catch (error) {
+      console.error("Error al seleccionar torneo:", error);
+      // Si hay error, limpiar datos posiblemente corruptos
+      sessionStorage.removeItem("gruposTorneo");
+      setGrupos([]);
     } finally {
       setLoadingTorneo(false);
     }
@@ -91,19 +123,64 @@ export default function Torneos() {
   };
 
   const renderTablasPorGrupos = () => {
-    const gruposTorneo = JSON.parse(sessionStorage.getItem("gruposTorneo")) || []; // Obtén los grupos desde sesión
-    console.log("Grupos del torneo:", gruposTorneo,tablaGeneral);
-    if (gruposTorneo.length > 0) {
-      return gruposTorneo.map((grupo, index) => (
-        <Box key={index} sx={{ marginBottom: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            Grupo {grupo.numero}
+    try {
+      const gruposTorneoRaw = sessionStorage.getItem("gruposTorneo");
+      console.log("Datos raw de gruposTorneo:", gruposTorneoRaw);
+      
+      // Verificar si la respuesta es HTML (sesión expirada) antes de parsear
+      if (typeof gruposTorneoRaw === 'string' && 
+          (gruposTorneoRaw.includes('<!DOCTYPE HTML') || 
+           gruposTorneoRaw.includes('Sesión no válida') || 
+           gruposTorneoRaw.includes('Inactividad de Sesión'))) {
+        console.error("Sesión expirada detectada en renderTablasPorGrupos");
+        sessionStorage.clear();
+        return (
+          <Typography variant="body2" color="error">
+            Sesión expirada. Por favor, inicia sesión nuevamente.
           </Typography>
-          <TablaGeneral
-            data={tablaGeneral.filter((equipo) => grupo.equipos.some((e) => e.id === equipo.idEquipo))} // Filtra los equipos por ID
-          />
-        </Box>
-      ));
+        );
+      }
+      
+      const gruposTorneo = JSON.parse(gruposTorneoRaw || "[]");
+      console.log("Grupos del torneo:", gruposTorneo, tablaGeneral);
+      
+      // Validar que gruposTorneo sea un array válido
+      if (!Array.isArray(gruposTorneo)) {
+        console.error("gruposTorneo no es un array válido:", gruposTorneo);
+        sessionStorage.removeItem("gruposTorneo");
+        return (
+          <Typography variant="body2" color="error">
+            Error: Datos de grupos corruptos. Por favor, refresca la página.
+          </Typography>
+        );
+      }
+      
+      if (gruposTorneo.length > 0) {
+        return gruposTorneo.map((grupo, index) => (
+          <Box key={index} sx={{ marginBottom: 4 }}>
+            <Typography variant="h5" gutterBottom>
+              Grupo {grupo.numero}
+            </Typography>
+            <TablaGeneral
+              data={Array.isArray(tablaGeneral) ? 
+                tablaGeneral.filter((equipo) => 
+                  Array.isArray(grupo.equipos) ? 
+                    grupo.equipos.some((e) => e.id === equipo.idEquipo) : 
+                    []
+                ) : []
+              }
+            />
+          </Box>
+        ));
+      }
+    } catch (error) {
+      console.error("Error al procesar grupos del torneo:", error);
+      sessionStorage.removeItem("gruposTorneo");
+      return (
+        <Typography variant="body2" color="error">
+          Error al cargar los grupos. Por favor, inicia sesión nuevamente.
+        </Typography>
+      );
     }
   
     return (
@@ -114,7 +191,10 @@ export default function Torneos() {
   };
 
   const getJornadasPendientes = () => {
-    if (!Array.isArray(jornadas)) return [];
+    if (!Array.isArray(jornadas)) {
+      console.error("jornadas no es un array válido:", jornadas);
+      return [];
+    }
     
     const pendientes = jornadas
       .flatMap((item) => Array.isArray(item.jornada) ? item.jornada : [])
@@ -127,7 +207,10 @@ export default function Torneos() {
   };
 
   const getFilteredJornadas = () => {
-    if (!Array.isArray(jornadas)) return [];
+    if (!Array.isArray(jornadas)) {
+      console.error("jornadas no es un array válido en getFilteredJornadas:", jornadas);
+      return [];
+    }
     
     if (activeTab === 1) {
       // Todas las jornadas

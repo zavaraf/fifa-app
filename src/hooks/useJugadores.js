@@ -101,7 +101,56 @@ const useJugadores = () => {
     [user.idTemporada]
   );
 
-  return { jugadores, loading, error, fetchJugadores, fetchAllJugadores, updateJugador, createJugador }; // Exporta los datos y funciones
+
+  // Buscar jugador en Sofifa por ID (API pública)
+  const fetchJugadorSofifaById = useCallback(async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = `https://api.sofifa.net/player/${id}`;
+      const response = await axios.get(url);
+      const data = response.data?.data;
+      console.log("Sofifa data:", data);
+      if (!data) return null;
+      // Mapeo al formato local
+      const jugadorMapeado = {
+        idsofifa: data.id,
+        sobrenombre: data.commonName,
+        nombre: `${data.firstName} ${data.lastName}`.trim(),
+        equipo: { nombre: data.teams?.[0]?.name || "" },
+        img: `https://sofifa.net/images/players/${data.id}.png`,
+        raiting: data.overallRating,
+        pais: data.country,
+        edad: data.age,
+        posicion: data.position1,
+        // Puedes agregar más campos si los necesitas
+      };
+      return jugadorMapeado;
+    } catch (err) {
+      setError("No se encontró el jugador en Sofifa.");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Consultar detalles del jugador en el servicio propio
+  const fetchDetallesJugadorSofifa = useCallback(async (idsofifa) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = `${API_CONFIG.BASE_URL}/sofifa/player/${idsofifa}`;
+      const response = await axios.get(url);
+      return response.data;
+    } catch (err) {
+      setError("No se pudo obtener detalles del jugador Sofifa.");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { jugadores, loading, error, fetchJugadores, fetchAllJugadores, updateJugador, createJugador, fetchJugadorSofifaById, fetchDetallesJugadorSofifa }; // Exporta los datos y funciones
 };
 
 export default useJugadores;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, Paper, TextField, Chip } from "@mui/material";
+import { Box, Typography, Paper, TextField, Chip, Avatar } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ResumenPartidoModal from "./ResumenPartidoModal"; // Importa el componente modal
 
@@ -210,16 +210,20 @@ const Jornadas = ({
                             }}
                           >
                             <Box sx={{ display: "flex", alignItems: "center" }}>
-                              <img
+                              <Avatar
                                 src={jor.imgLocal}
                                 alt={jor.nombreEquipoLocal}
-                                style={{
+                                sx={{
                                   width: 18,
                                   height: 18,
-                                  objectFit: "contain",
-                                  marginRight: 5,
+                                  mr: 0.5,
+                                  bgcolor: 'primary.main',
+                                  fontSize: 8,
+                                  fontWeight: 600
                                 }}
-                              />
+                              >
+                                {!jor.imgLocal && (jor.nombreEquipoLocal || "?").charAt(0).toUpperCase()}
+                              </Avatar>
                               <Typography
                                 variant="caption"
                                 sx={{
@@ -247,16 +251,20 @@ const Jornadas = ({
                             }}
                           >
                             <Box sx={{ display: "flex", alignItems: "center" }}>
-                              <img
+                              <Avatar
                                 src={jor.imgVisita}
                                 alt={jor.nombreEquipoVisita}
-                                style={{
+                                sx={{
                                   width: 18,
                                   height: 18,
-                                  objectFit: "contain",
-                                  marginRight: 5,
+                                  mr: 0.5,
+                                  bgcolor: 'secondary.main',
+                                  fontSize: 8,
+                                  fontWeight: 600
                                 }}
-                              />
+                              >
+                                {!jor.imgVisita && (jor.nombreEquipoVisita || "?").charAt(0).toUpperCase()}
+                              </Avatar>
                               <Typography
                                 variant="caption"
                                 sx={{
@@ -366,16 +374,20 @@ const Jornadas = ({
                       }}
                     >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <img
+                        <Avatar
                           src={jor.imgLocal}
                           alt={jor.nombreEquipoLocal}
-                          style={{
+                          sx={{
                             width: 18,
                             height: 18,
-                            objectFit: "contain",
-                            marginRight: 5,
+                            mr: 0.5,
+                            bgcolor: 'primary.main',
+                            fontSize: 8,
+                            fontWeight: 600
                           }}
-                        />
+                        >
+                          {!jor.imgLocal && (jor.nombreEquipoLocal || "?").charAt(0).toUpperCase()}
+                        </Avatar>
                         <Typography
                           variant="caption"
                           sx={{
@@ -403,16 +415,20 @@ const Jornadas = ({
                       }}
                     >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <img
+                        <Avatar
                           src={jor.imgVisita}
                           alt={jor.nombreEquipoVisita}
-                          style={{
+                          sx={{
                             width: 18,
                             height: 18,
-                            objectFit: "contain",
-                            marginRight: 5,
+                            mr: 0.5,
+                            bgcolor: 'secondary.main',
+                            fontSize: 8,
+                            fontWeight: 600
                           }}
-                        />
+                        >
+                          {!jor.imgVisita && (jor.nombreEquipoVisita || "?").charAt(0).toUpperCase()}
+                        </Avatar>
                         <Typography
                           variant="caption"
                           sx={{

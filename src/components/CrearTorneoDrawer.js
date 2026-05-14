@@ -438,9 +438,9 @@ const CrearTorneoDrawer = ({ open, onClose, onTorneoCreated }) => {
                   }}>
                     {equipos
                       .filter(equipo => 
-                        equipo.nombre.toLowerCase().includes(searchEquipos.toLowerCase())
+                        (equipo.nombre || "").toLowerCase().includes((searchEquipos || "").toLowerCase())
                       )
-                      .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                      .sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""))
                       .map((equipo, index, filteredArray) => (
                       <Box
                         key={equipo.id}
@@ -496,7 +496,7 @@ const CrearTorneoDrawer = ({ open, onClose, onTorneoCreated }) => {
                     ))}
                     
                     {equipos.filter(equipo => 
-                      equipo.nombre.toLowerCase().includes(searchEquipos.toLowerCase())
+                      (equipo.nombre || "").toLowerCase().includes((searchEquipos || "").toLowerCase())
                     ).length === 0 && (
                       <Box sx={{ p: 4, textAlign: "center" }}>
                         <Typography variant="body2" color="text.secondary">

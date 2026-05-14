@@ -59,6 +59,7 @@ const useEquipos = () => {
       setError(null);
       try {
         const url = `${API_CONFIG.BASE_URL}/equipo/${equipo.id}/${user.idTemporada}`;
+        console.log("Equipo a modificar:", JSON.stringify(equipo));
         await axios.put(url, equipo);
         return true;
       } catch (err) {

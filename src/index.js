@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+// Importar configuración de API para activar interceptors
+import './config/apiConfig';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -182,14 +182,16 @@ export default function Equipos() {
                     )}
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="Editar">
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleEdit(equipo)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
+                    {isAdmin && (
+                      <Tooltip title="Editar">
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleEdit(equipo)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -280,12 +282,12 @@ export default function Equipos() {
           )}
         </DialogContent>
         <DialogActions>
-          <>
-            <Button onClick={handleClose}>Cancelar</Button>
+          <Button onClick={handleClose}>Cancelar</Button>
+          {isAdmin && (
             <Button variant="contained" onClick={handleSave}>
               Guardar
             </Button>
-          </>
+          )}
         </DialogActions>
       </Dialog>
     </Box>

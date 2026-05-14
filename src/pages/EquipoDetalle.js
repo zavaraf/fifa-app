@@ -828,18 +828,23 @@ const MovimientosTab = ({ equipo }) => (
             borderColor: (theme) => theme.palette.mode === "dark" ? "rgba(76, 175, 80, 0.3)" : "rgba(76, 175, 80, 0.2)"
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Box 
-              sx={{ 
-                width: 8, 
-                height: 8, 
-                borderRadius: "50%", 
-                bgcolor: "success.main", 
-                mr: 1 
-              }} 
-            />
-            <Typography variant="h6" fontWeight={600} color="success.main">
-              Altas ({equipo.altas?.length || 0})
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2, justifyContent: "space-between" }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box 
+                sx={{ 
+                  width: 8, 
+                  height: 8, 
+                  borderRadius: "50%", 
+                  bgcolor: "success.main", 
+                  mr: 1 
+                }} 
+              />
+              <Typography variant="h6" fontWeight={600} color="success.main">
+                Altas ({equipo.altas?.length || 0})
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="success.main" fontWeight={600}>
+              Total: ${equipo.altas?.reduce((sum, j) => sum + (Number(j.costo) || 0), 0).toLocaleString()}
             </Typography>
           </Box>
           
@@ -897,18 +902,23 @@ const MovimientosTab = ({ equipo }) => (
             borderColor: (theme) => theme.palette.mode === "dark" ? "rgba(244, 67, 54, 0.3)" : "rgba(244, 67, 54, 0.2)"
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Box 
-              sx={{ 
-                width: 8, 
-                height: 8, 
-                borderRadius: "50%", 
-                bgcolor: "error.main", 
-                mr: 1 
-              }} 
-            />
-            <Typography variant="h6" fontWeight={600} color="error.main">
-              Bajas ({equipo.bajas?.length || 0})
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2, justifyContent: "space-between" }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box 
+                sx={{ 
+                  width: 8, 
+                  height: 8, 
+                  borderRadius: "50%", 
+                  bgcolor: "error.main", 
+                  mr: 1 
+                }} 
+              />
+              <Typography variant="h6" fontWeight={600} color="error.main">
+                Bajas ({equipo.bajas?.length || 0})
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="error.main" fontWeight={600}>
+              Total: ${equipo.bajas?.reduce((sum, j) => sum + (Number(j.costo) || 0), 0).toLocaleString()}
             </Typography>
           </Box>
           
@@ -966,18 +976,27 @@ const MovimientosTab = ({ equipo }) => (
             borderColor: (theme) => theme.palette.mode === "dark" ? "rgba(255, 152, 0, 0.3)" : "rgba(255, 152, 0, 0.2)"
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Box 
-              sx={{ 
-                width: 8, 
-                height: 8, 
-                borderRadius: "50%", 
-                bgcolor: "warning.main", 
-                mr: 1 
-              }} 
-            />
-            <Typography variant="h6" fontWeight={600} color="warning.main">
-              En Draft ({equipo.draftpc?.length || 0})
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2, justifyContent: "space-between" }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box 
+                sx={{ 
+                  width: 8, 
+                  height: 8, 
+                  borderRadius: "50%", 
+                  bgcolor: "warning.main", 
+                  mr: 1 
+                }} 
+              />
+              <Typography variant="h6" fontWeight={600} color="warning.main">
+                En Draft ({equipo.draftpc?.length || 0})
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="warning.main" fontWeight={600}>
+              Total: ${
+                equipo.draftpc?.filter(j => j.equipo?.id === Number(equipo.id))
+                  .reduce((sum, j) => sum + (Number(j.ofertaFinal) || 0), 0)
+                  .toLocaleString()
+              }
             </Typography>
           </Box>
           
