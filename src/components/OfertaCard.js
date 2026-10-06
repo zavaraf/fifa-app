@@ -69,7 +69,7 @@ export default function OfertaCard({
       }}
     >
       <CardHeader
-        avatar={<Avatar src={oferta.img} alt={oferta.nombre} sx={{ width: 56, height: 56 }} />}
+        avatar={<Avatar src={oferta.img} alt={oferta.nombre} sx={{ width: 56, height: 56 }} imgProps={{ referrerPolicy: "no-referrer" }} />}
         title={
           <Typography fontWeight={700} variant="h6" component="div" noWrap>
             {oferta.sobrenombre || oferta.nombre}
@@ -124,7 +124,7 @@ export default function OfertaCard({
             to={`/equipo/${oferta.idEquipoOferta}`}
             sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none', color: 'inherit', flexShrink: 1, minWidth: 0 }}
           >
-            <Avatar src={oferta.equipo?.img} sx={{ width: 32, height: 32 }} />
+            <Avatar src={oferta.equipo?.img} sx={{ width: 32, height: 32 }} imgProps={{ referrerPolicy: "no-referrer" }} />
             <Typography variant="body2" fontWeight={600} noWrap>
               {oferta.comentarios}
             </Typography>

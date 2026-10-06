@@ -70,6 +70,7 @@ export default function TablaJugadores({ jugadores, loading, onEdit }) {
                   <Avatar
                     src={jugador.img}
                     alt={jugador.sobrenombre}
+                    imgProps={{ referrerPolicy: "no-referrer" }}
                     sx={{
                       width: { xs: 32, md: 36 },
                       height: { xs: 32, md: 36 },

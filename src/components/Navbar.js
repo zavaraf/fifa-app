@@ -36,6 +36,7 @@ export default function Navbar({ toggleTheme, themeMode }) {
     { to: "/jugadores", label: "Jugadores" },
     { to: "/equipos", label: "Equipos" },
     { to: "/draft-pc", label: "Draft PC" },
+    { to: "/salon-fama", label: "Salón de la Fama" },
   ];
 
   // Agregar Admin Torneo solo si es administrador

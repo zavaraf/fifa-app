@@ -27,7 +27,7 @@ export default function TablaGoleo({ goleo = [] }) {
               <TableCell sx={{ textAlign: "center" }}>{idx + 1}</TableCell>
               <TableCell>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Avatar src={jugador.img} alt={jugador.sobrenombre} sx={{ width: 28, height: 28 }} />
+                  <Avatar src={jugador.img} alt={jugador.sobrenombre} sx={{ width: 28, height: 28 }} imgProps={{ referrerPolicy: "no-referrer" }} />
                   <Tooltip title={jugador.sobrenombre} arrow>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
                       {shortName(jugador.sobrenombre)}

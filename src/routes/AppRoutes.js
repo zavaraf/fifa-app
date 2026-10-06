@@ -9,6 +9,7 @@ import Equipos from "../pages/Equipos";
 import EquipoDetalle from "../pages/EquipoDetalle";
 import AdminTorneo from "../pages/AdminTorneo";
 import DraftPC from "../pages/DraftPC";
+import SalonFama from "../pages/SalonFama";
 
 export default function AppRoutes() {
   return (
@@ -74,6 +75,16 @@ export default function AppRoutes() {
         element={
           <PrivateRoute>
             <DraftPC />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida para Salón de la Fama */}
+      <Route
+        path="/salon-fama"
+        element={
+          <PrivateRoute>
+            <SalonFama />
           </PrivateRoute>
         }
       />

@@ -179,6 +179,7 @@ export default function JugadoresParaOfertar({
                       <Avatar
                         src={jugador.img}
                         alt={jugador.nombreCompleto}
+                        imgProps={{ referrerPolicy: "no-referrer" }}
                         sx={{
                           width: 56,
                           height: 56,
